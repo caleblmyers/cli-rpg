@@ -1,9 +1,12 @@
+var chalk = require("chalk")
 var inquirer = require("inquirer")
 var Enemy = require("./constructors/enemy")
 var ClassList = require("./constructors/class-list")
 var Guardian = ClassList.Guardian;
 var Ranger = ClassList.Ranger;
 var Arcanist = ClassList.Arcanist;
+
+var bold = chalk.bold
 
 var characters = []
 var enemies = []
@@ -20,26 +23,28 @@ var lich = new Enemy("Lich", 18, 55, 550, 999)
 var lesserDemon = new Enemy("Lesser Demon", 26, 66, 666, 1666)
 
 enemies.push(skeleton, bandit, minotaur, vampire, necromancer, golem, lich, lesserDemon)
-var activeEnemy = enemies[0]
-var activeChar
+
+var opponent
+var player
 
 function gameMenu() {
-  var opponent = activeEnemy
-  var player = activeChar
-
   inquirer
     .prompt([
       {
         type: "list",
         name: "action",
         message: "What would you like to do?",
-        choices: ["Battle", "Shop", "Inventory", "Stats", "Main Menu"]
+        choices: ["Battle", "Shop", "Inventory", "Stats", "Return to Town"]
       }
     ])
     .then(function (res) {
       switch (res.action) {
         case "Battle":
-          console.log("\n" + player.name + " vs " + opponent.name + "\n")
+          pickEnemy()
+          // console.log("\n" + player.name + " vs " + opponent.name + "\n")
+          console.log(bold("\n      ##########################################\n"))
+          console.log(bold("              " + chalk.blue(player.name) + "     vs     " + chalk.red(opponent.name) + "       "))
+          console.log(bold("\n      ##########################################\n"))
           makeMove(opponent, player)
           break;
 
@@ -47,9 +52,8 @@ function gameMenu() {
           player.printStats()
           gameMenu()
           break;
-
-        case "Main Menu":
-          console.log("\nReturning to main menu. \n")
+        case "Return to Town":
+          console.log("\nReturning to town.\n")
           mainMenu()
           break;
 
@@ -58,6 +62,19 @@ function gameMenu() {
           break;
       }
     })
+}
+
+function pickEnemy() {
+  var enemyIndex
+  if (player.lvl < 5) {
+    enemyIndex = Math.floor(Math.random() * 2)
+  } else if (player.lvl < 12) {
+    enemyIndex = Math.floor(Math.random() * 3 + 2)
+  } else {
+    enemyIndex = Math.floor(Math.random() * 4 + 4)
+  }
+  opponent = enemies[enemyIndex]
+  opponent.hp = opponent.maxHp
 }
 
 function makeMove(opponent, player) {
@@ -89,8 +106,8 @@ function makeMove(opponent, player) {
         var playerIndex = characters.indexOf(player)
         characters.splice(playerIndex, 1)
         console.log("May your soul find peace in the aether, " + player.name + "...\n")
-        activeChar = characters[0]
-        mainMenu()
+        player = characters[0]
+        return mainMenu()
       }
 
       if (opponent.isAlive()) {
@@ -100,7 +117,6 @@ function makeMove(opponent, player) {
         console.log("Enemy defeated!\n")
         console.log("You gained " + opponent.xp + " XP!\n")
         player.gainXP(opponent.xp)
-        opponent.hp = opponent.maxHp
         gameMenu()
       }
     })
@@ -139,7 +155,6 @@ function createCharacter() {
       // Add area for char description
     ])
     .then(function (user) {
-      console.log("\nCharacter created!\n")
       checkClass(user)
     })
 }
@@ -169,61 +184,30 @@ function checkClass(user) {
 
 function addCharacter(character) {
   characters.push(character)
-  console.log(character.name + " added to characters!\n")
-  console.log(character.name + " is now the active character.\n")
-  activeChar = characters[characters.length - 1]
+  console.log("\n" + character.name + " added to characters!\n")
+  console.log(character.name + " is now the active character.")
+  player = characters[characters.length - 1]
+  character.printStats()
   mainMenu()
 }
 
-function chooseCharacter() {
-  if (characters.length > 0) {
-    var charIndex = characters.indexOf(activeChar)
-    if (charIndex === (characters.length - 1)) {
-      activeChar = characters[0]
-    } else {
-      activeChar = characters[charIndex + 1]
-    }
-    console.log("\nCharacter switched to: " + activeChar.name + "\n")
+function changeCharacter() {
+  var charIndex = characters.indexOf(player)
+  if (charIndex === (characters.length - 1)) {
+    player = characters[0]
   } else {
-    console.log("\nNo characters available!\n")
+    player = characters[charIndex + 1]
   }
-  mainMenu()
-}
 
-function chooseEnemy() {
-  // Add lvl blocking feature
-  var enemyIndex = enemies.indexOf(activeEnemy)
-  if (enemyIndex === (enemies.length - 1)) {
-    activeEnemy = enemies[0]
-  } else {
-    activeEnemy = enemies[enemyIndex + 1]
-  }
-  console.log("\nEnemy switched to: " + activeEnemy.name + "\n")
+  console.log("\nCharacter switched to: " + player.name + "\n")
   mainMenu()
 }
 
 function browseCharacters() {
-  if (characters.length > 0) {
-    characters.forEach(function (character) {
-      character.printStats()
-    })
-  } else {
-    console.log("\nNo characters available!\n")
-  }
-  mainMenu()
-}
+  characters.forEach(function (character) {
+    character.printStats()
+  })
 
-function levelCharacter() {
-  // Let fn take in a number for amount of levels
-  if (characters.length > 0) {
-    console.log("")
-    console.log(activeChar.name, "has leveled up!\n")
-    for (let i = 0; i < 50; i++) {
-      activeChar.levelUp()
-    }
-  } else {
-    console.log("\nNo characters available!\n")
-  }
   mainMenu()
 }
 
@@ -233,15 +217,32 @@ function mainMenu() {
       {
         type: "list",
         name: "input",
-        message: "Welcome! What would you like to do?",
-        choices: ["Begin Game", "Choose Enemy", "Create Character", "Choose Character", "Browse Characters", "Level Character", "Exit Game"]
+        message: "Welcome traveler. Choose an option: ",
+        choices: function () {
+          if (characters.length > 0) {
+            return ["Adventure", "Create Character", "Change Character", "Browse Characters", "Exit Game"]
+          } else {
+            return ["Create Character", "Exit Game"]
+          }
+        }
       }
     ])
     .then(function (res) {
       switch (res.input) {
-        case "Begin Game":
+        case "Adventure":
           if (characters.length > 0) {
-            console.log("\nGame begun with " + activeChar.name + "!\n")
+            console.log(bold("\n      ##########################################"))
+            console.log(bold("      ##                                      ##"))
+            console.log(bold("      ##                                      ##"))
+            console.log(bold("      ##          " + chalk.red("Entering the wilds") + "          ##"))
+            console.log(bold("      ##                                      ##"))
+            console.log(bold("      ##                                      ##"))
+            console.log(bold("      ##            Tread lightly             ##"))
+            console.log(bold("      ##                                      ##"))
+            console.log(bold("      ##           Brave traveler...          ##"))
+            console.log(bold("      ##                                      ##"))
+            console.log(bold("      ##                                      ##"))
+            console.log(bold("      ##########################################\n"))
             gameMenu()
           } else {
             console.log("\nNo characters available!\n")
@@ -249,24 +250,17 @@ function mainMenu() {
           }
           break;
 
-        case "Choose Enemy":
-          chooseEnemy()
-          break;
-
         case "Create Character":
+          console.log("\nCreating character...\n")
           createCharacter()
           break;
 
-        case "Choose Character":
-          chooseCharacter()
+        case "Change Character":
+          changeCharacter()
           break;
 
         case "Browse Characters":
           browseCharacters()
-          break;
-
-        case "Level Character":
-          levelCharacter()
           break;
 
         case "Exit Game":
@@ -279,6 +273,24 @@ function mainMenu() {
       }
     })
 }
+
+
+console.log("\n")
+
+console.log(bold("      ##########################################"))
+console.log(bold("      ##                                      ##"))
+console.log(bold("      ##                                      ##"))
+console.log(bold("      ##          " + chalk.green("The Last Sanctum") + "            ##"))
+console.log(bold("      ##                                      ##"))
+console.log(bold("      ##                                      ##"))
+console.log(bold("      ##          An Adventure RPG            ##"))
+console.log(bold("      ##                                      ##"))
+console.log(bold("      ##       Our world needs heroes...      ##"))
+console.log(bold("      ##                                      ##"))
+console.log(bold("      ##                                      ##"))
+console.log(bold("      ##########################################"))
+
+console.log("\n")
 
 mainMenu()
 

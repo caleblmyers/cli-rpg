@@ -1,5 +1,4 @@
 function Character(user) {
-  // Add method that changes based on prof
   this.name = user.name
   this.prof = user.prof
   this.race = user.race
@@ -19,10 +18,10 @@ function Character(user) {
 Character.prototype.printStats = function () {
   console.log("\n=========================\n")
   console.log("Stats for " + this.name)
-  console.log("Profession: " + this.prof)
-  console.log("Race: " + this.race)
-  console.log("Gender: " + this.gender)
-  console.log("Age: " + this.age)
+  console.log("Class: " + this.prof)
+  // console.log("Race: " + this.race)
+  // console.log("Gender: " + this.gender)
+  // console.log("Age: " + this.age)
   console.log("Level: " + this.lvl)
   console.log("Experience: " + this.xp)
   console.log("XP Needed: " + (this.toNext - this.xp))
@@ -37,26 +36,21 @@ Character.prototype.isAlive = function () {
     console.log("\nYou have", this.hp, "HP remaining\n")
     return true
   } else {
-    console.log("")
-    console.log("Oh dear...you seem to have died!")
-    console.log("")
-    console.log("It was a good attempt...for a mortal.")
-    console.log("")
+    console.log("\nOh dear...you seem to have died!\n")
+    console.log("It was a good attempt...for a mortal.\n")
     return false
   }
 }
 
-Character.prototype.attack = function (enemyHP) {
-  return enemyHP - this.str
-}
-
 Character.prototype.gainXP = function (xp) {
   this.xp += xp
+
+  var xpOver
   if (this.xp > this.toNext) {
-    var xpOver = this.xp - this.toNext
+    xpOver = this.xp - this.toNext
     console.log(this.name + " has leveled up!\n")
+    console.log(this.name + " is now level " + (this.lvl + 1) + "!\n")
     this.levelUp(xpOver)
-    console.log(this.name + " is now level " + this.lvl + "!\n")
   }
 }
 
@@ -67,6 +61,11 @@ Character.prototype.levelUp = function (xpOver) {
   this.str += 5 + Math.floor(this.lvl / 3)
   this.maxHp += 25 + (5 * Math.floor(this.lvl / 3))
   this.hp = this.maxHp
+
+  if (this.xp > this.toNext) {
+    xpOver = this.xp - this.toNext
+    this.levelUp(xpOver)
+  }
 }
 
 module.exports = Character;
