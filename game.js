@@ -47,12 +47,23 @@ function gameMenu() {
           makeMove(opponent, player)
           break;
 
+        case "Shop":
+          console.log("\nShop closed! Try back later!\n")
+          gameMenu()
+          break;
+
+        case "Inventory":
+          console.log("\nInventory is empty.\n")
+          gameMenu()
+          break;
+
         case "Stats":
           player.printStats()
           gameMenu()
           break;
+
         case "Return to Town":
-          console.log("\nReturning to town.\n")
+          console.log("\nReturning to town...\n")
           mainMenu()
           break;
 
@@ -105,8 +116,7 @@ function makeMove(opponent, player) {
           console.log("Next round!\n")
           makeMove(opponent, player)
         } else {
-          console.log("Enemy defeated!\n")
-          console.log("You gained " + opponent.xp + " XP!\n")
+          console.log("Enemy defeated! You gained " + opponent.xp + " XP!\n")
           player.gainXP(opponent.xp)
           gameMenu()
         }
@@ -262,7 +272,7 @@ function mainMenu() {
           break;
 
         default:
-          console.log("\nError in the switch!\n")
+          console.log("\nError in the main menu!\n")
           break;
       }
     })
