@@ -41,7 +41,6 @@ function gameMenu() {
       switch (res.action) {
         case "Battle":
           pickEnemy()
-          // console.log("\n" + player.name + " vs " + opponent.name + "\n")
           console.log(bold("\n      ##########################################\n"))
           console.log(bold("              " + chalk.blue(player.name) + "     vs     " + chalk.red(opponent.name) + "       "))
           console.log(bold("\n      ##########################################\n"))
@@ -102,22 +101,21 @@ function makeMove(opponent, player) {
 
       if (player.isAlive()) {
         opponent.hp = player.attack(user.ability, opponent)
+        if (opponent.isAlive()) {
+          console.log("Next round!\n")
+          makeMove(opponent, player)
+        } else {
+          console.log("Enemy defeated!\n")
+          console.log("You gained " + opponent.xp + " XP!\n")
+          player.gainXP(opponent.xp)
+          gameMenu()
+        }
       } else {
         var playerIndex = characters.indexOf(player)
         characters.splice(playerIndex, 1)
         console.log("May your soul find peace in the aether, " + player.name + "...\n")
-        player = characters[0]
-        return mainMenu()
-      }
-
-      if (opponent.isAlive()) {
-        console.log("Next round!\n")
-        makeMove(opponent, player)
-      } else {
-        console.log("Enemy defeated!\n")
-        console.log("You gained " + opponent.xp + " XP!\n")
-        player.gainXP(opponent.xp)
-        gameMenu()
+        player = ''
+        mainMenu()
       }
     })
 }
@@ -186,7 +184,6 @@ function addCharacter(character) {
   characters.push(character)
   console.log("\n" + character.name + " added to characters!\n")
   console.log(character.name + " is now the active character.")
-  player = characters[characters.length - 1]
   character.printStats()
   mainMenu()
 }
@@ -212,6 +209,8 @@ function browseCharacters() {
 }
 
 function mainMenu() {
+  player = characters[characters.length - 1]
+
   inquirer
     .prompt([
       {
@@ -230,24 +229,19 @@ function mainMenu() {
     .then(function (res) {
       switch (res.input) {
         case "Adventure":
-          if (characters.length > 0) {
-            console.log(bold("\n      ##########################################"))
-            console.log(bold("      ##                                      ##"))
-            console.log(bold("      ##                                      ##"))
-            console.log(bold("      ##          " + chalk.red("Entering the wilds") + "          ##"))
-            console.log(bold("      ##                                      ##"))
-            console.log(bold("      ##                                      ##"))
-            console.log(bold("      ##            Tread lightly             ##"))
-            console.log(bold("      ##                                      ##"))
-            console.log(bold("      ##           Brave traveler...          ##"))
-            console.log(bold("      ##                                      ##"))
-            console.log(bold("      ##                                      ##"))
-            console.log(bold("      ##########################################\n"))
-            gameMenu()
-          } else {
-            console.log("\nNo characters available!\n")
-            mainMenu()
-          }
+          console.log(bold("\n      ##########################################"))
+          console.log(bold("      ##                                      ##"))
+          console.log(bold("      ##                                      ##"))
+          console.log(bold("      ##          " + chalk.red("Entering the wilds") + "          ##"))
+          console.log(bold("      ##                                      ##"))
+          console.log(bold("      ##                                      ##"))
+          console.log(bold("      ##            Tread lightly             ##"))
+          console.log(bold("      ##                                      ##"))
+          console.log(bold("      ##           Brave traveler...          ##"))
+          console.log(bold("      ##                                      ##"))
+          console.log(bold("      ##                                      ##"))
+          console.log(bold("      ##########################################\n"))
+          gameMenu()
           break;
 
         case "Create Character":
