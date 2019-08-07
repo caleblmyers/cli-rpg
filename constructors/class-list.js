@@ -5,16 +5,22 @@ function Guardian (user) {
 
   this.hp = 100
   this.maxHp = 100
+  // this.abilities = [
+  //   {
+  //     name: "Shield Bash",
+  //   }
+  // ]
   this.abilities.push("Shield Bash")
 }
 
 Guardian.prototype = Object.create(Character.prototype)
+Guardian.prototype.constructor = Guardian;
 
-Object.defineProperty(Guardian.prototype, 'constructor', {
-  value: Guardian,
-  enumerable: false,
-  writable: true
-})
+// Object.defineProperty(Guardian.prototype, 'constructor', {
+//   value: Guardian,
+//   enumerable: false,
+//   writable: true
+// })
 
 Guardian.prototype.attack = function (ability, opponent) {
   if (ability === "Attack") {
@@ -24,6 +30,12 @@ Guardian.prototype.attack = function (ability, opponent) {
   }
 }
 
+Guardian.prototype.levelUp = function (xpOver) {
+  console.log("\nCalling Char level fn\n")
+  Object.getPrototypeOf(Guardian.prototype).levelUp.call(this, xpOver);
+  console.log("\nGuardian level\n")
+}
+
 function Ranger (user) {
   Character.call(this, user)
 
@@ -31,12 +43,21 @@ function Ranger (user) {
 }
 
 Ranger.prototype = Object.create(Character.prototype)
+Ranger.prototype.constructor = Ranger;
 
 Object.defineProperty(Ranger.prototype, 'constructor', {
   value: Ranger,
   enumerable: false,
   writable: true
 })
+
+Ranger.prototype.attack = function (ability, opponent) {
+  if (ability === "Attack") {
+    return opponent.hp - this.str
+  } else if (ability === "Shield Bash") {
+    return opponent.hp - (this.str - (-2))
+  }
+}
 
 function Arcanist (user) {
   Character.call(this, user)

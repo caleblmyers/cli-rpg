@@ -31,6 +31,11 @@ Character.prototype.printStats = function () {
   console.log("\n=========================\n")
 }
 
+// Character.prototype.attack = function (abilities, index, opponent) {
+//   opponent.hp -= this.abilities[index].damage
+//   opponent.status.push(this.abilities[index].status)
+// }
+
 Character.prototype.isAlive = function () {
   if (this.hp > 0) {
     console.log("\nYou have", this.hp, "HP remaining\n")
@@ -45,16 +50,16 @@ Character.prototype.isAlive = function () {
 Character.prototype.gainXP = function (xp) {
   this.xp += xp
 
-  var xpOver
-  if (this.xp > this.toNext) {
-    xpOver = this.xp - this.toNext
-    console.log(this.name + " has leveled up! " + this.name + " is now level " + (this.lvl + 1) + "!\n")
+  if (this.xp >= this.toNext) {
+    var xpOver = this.xp - this.toNext
     this.levelUp(xpOver)
   }
 }
 
 Character.prototype.levelUp = function (xpOver) {
+  console.log("\nChar lvl\n")
   this.lvl++
+  console.log(this.name + " has leveled up! " + this.name + " is now level " + this.lvl + "!\n")
   this.xp = 0 + xpOver
   this.toNext += 10
   this.str += 5 + Math.floor(this.lvl / 3)

@@ -8,10 +8,12 @@ var Arcanist = ClassList.Arcanist;
 
 var bold = chalk.bold
 
+var player
+var opponent
 var characters = []
 var enemies = []
 var classes = ["Guardian", "Ranger", "Arcanist"]
-var races = ["Imperial", "Freefolk", "Wood Elf", "Dark Elf", "Lycan", "Voidwoken"]
+// var races = ["Imperial", "Freefolk", "Wood Elf", "Dark Elf"]
 
 var skeleton = new Enemy("Skeleton", 1, 2, 12, 4)
 var bandit = new Enemy("Bandit", 3, 5, 25, 10)
@@ -23,9 +25,6 @@ var lich = new Enemy("Lich", 18, 55, 550, 999)
 var lesserDemon = new Enemy("Lesser Demon", 26, 66, 666, 1666)
 
 enemies.push(skeleton, bandit, minotaur, vampire, necromancer, golem, lich, lesserDemon)
-
-var opponent
-var player
 
 function gameMenu() {
   inquirer
@@ -58,6 +57,7 @@ function gameMenu() {
           break;
 
         case "Stats":
+          console.log(bold("\nDisplaying stats for: " + player.name))
           player.printStats()
           gameMenu()
           break;
@@ -211,6 +211,7 @@ function changeCharacter() {
 }
 
 function browseCharacters() {
+  console.log(bold("\nDisplaying stats for all characters:"))
   characters.forEach(function (character) {
     character.printStats()
   })
@@ -278,9 +279,7 @@ function mainMenu() {
     })
 }
 
-
 console.log("\n")
-
 console.log(bold("      ##########################################"))
 console.log(bold("      ##                                      ##"))
 console.log(bold("      ##                                      ##"))
@@ -293,12 +292,21 @@ console.log(bold("      ##       Our world needs heroes...      ##"))
 console.log(bold("      ##                                      ##"))
 console.log(bold("      ##                                      ##"))
 console.log(bold("      ##########################################"))
-
 console.log("\n")
 
 mainMenu()
 
 /*
+
+
+Attack fn:
+-- Attacks are array of objects based on class
+-- Each attack deals different amt of dmg
+  -- and can apply status effects to enemy
+  -- or buffs to player
+--
+
+
 
 Different classes
 -- Give different stats
@@ -309,6 +317,7 @@ Different classes
 
 Game Features:
 -- Pre-made classes w/ different abilities
+-- Races? "Lycan", "Voidwoken"
 -- Enemies w/ different moves
 -- Inventory system (potions, poisions, etc.)
 -- Equipment system (weapons, armour)
