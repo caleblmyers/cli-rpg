@@ -57,7 +57,6 @@ Character.prototype.gainXP = function (xp) {
 }
 
 Character.prototype.levelUp = function (xpOver) {
-  console.log("\nChar lvl\n")
   this.lvl++
   console.log(this.name + " has leveled up! " + this.name + " is now level " + this.lvl + "!\n")
   this.xp = 0 + xpOver

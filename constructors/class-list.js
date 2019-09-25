@@ -1,6 +1,6 @@
 var Character = require("./character")
 
-function Guardian (user) {
+function Guardian(user) {
   Character.call(this, user)
 
   this.hp = 100
@@ -31,12 +31,10 @@ Guardian.prototype.attack = function (ability, opponent) {
 }
 
 Guardian.prototype.levelUp = function (xpOver) {
-  console.log("\nCalling Char level fn\n")
   Object.getPrototypeOf(Guardian.prototype).levelUp.call(this, xpOver);
-  console.log("\nGuardian level\n")
 }
 
-function Ranger (user) {
+function Ranger(user) {
   Character.call(this, user)
 
   this.str = 100
@@ -59,7 +57,7 @@ Ranger.prototype.attack = function (ability, opponent) {
   }
 }
 
-function Arcanist (user) {
+function Arcanist(user) {
   Character.call(this, user)
 
   this.def = 100
